@@ -18,7 +18,8 @@ def init_model(model_id, is_pf=False):
 
 
 @smart_inference_mode()
-def yoloe_inference(image, prompts, target_image, model_id, image_size, conf_thresh, iou_thresh, prompt_type):
+def yoloe_inference(image, prompts, target_image, image_size, conf_thresh, iou_thresh, prompt_type):
+    model_id = 'yoloe-11l'
     model = init_model(model_id)
     kwargs = {}
     if prompt_type == "Text":
@@ -77,18 +78,18 @@ def app():
                         </p>
                     """, show_label=False)
 
-                model_id = gr.Dropdown(
-                    label="Model",
-                    choices=[
-                        "yoloe-v8s",
-                        "yoloe-v8m",
-                        "yoloe-v8l",
-                        "yoloe-11s",
-                        "yoloe-11m",
-                        "yoloe-11l",
-                    ],
-                    value="yoloe-v8l",
-                )
+                # model_id = gr.Dropdown(
+                #     label="Model",
+                #     choices=[
+                #         "yoloe-v8s",
+                #         "yoloe-v8m",
+                #         "yoloe-v8l",
+                #         "yoloe-11s",
+                #         "yoloe-11m",
+                #         "yoloe-11l",
+                #     ],
+                #     value="yoloe-v8l",
+                # )
                 image_size = gr.Slider(
                     label="Image Size",
                     minimum=320,
@@ -170,7 +171,7 @@ def app():
             outputs=[target_image]
         )
 
-        def run_inference(raw_image, box_image, mask_image, target_image, texts, model_id, image_size, conf_thresh, iou_thresh, prompt_type, visual_prompt_type, visual_usage_type):
+        def run_inference(raw_image, box_image, mask_image, target_image, texts, image_size, conf_thresh, iou_thresh, prompt_type, visual_prompt_type, visual_usage_type):
             # add text/built-in prompts
             if prompt_type == "Text" or prompt_type == "Prompt-free":
                 target_image = None
@@ -211,60 +212,60 @@ def app():
                         "masks": masks[None],
                         "cls": np.array([0])
                     }
-            return yoloe_inference(image, prompts, target_image, model_id, image_size, conf_thresh, iou_thresh, prompt_type)
+            return yoloe_inference(image, prompts, target_image, image_size, conf_thresh, iou_thresh, prompt_type)
 
         yoloe_infer.click(
             fn=run_inference,
-            inputs=[raw_image, box_image, mask_image, target_image, texts, model_id, image_size, conf_thresh, iou_thresh, prompt_type, visual_prompt_type, visual_usage_type],
+            inputs=[raw_image, box_image, mask_image, target_image, texts, image_size, conf_thresh, iou_thresh, prompt_type, visual_prompt_type, visual_usage_type],
             outputs=[output_image],
         )
 
         ###################### Examples ##########################
-        text_examples = gr.Examples(
-            examples=[[
-                "ultralytics/assets/bus.jpg",
-                "person,bus",
-                "yoloe-v8l",
-                640,
-                0.25,
-                0.7]], 
-            inputs=[raw_image, texts, model_id, image_size, conf_thresh, iou_thresh], 
-            visible=True, cache_examples=False, label="Text Prompt Examples")
+        # text_examples = gr.Examples(
+        #     examples=[[
+        #         "ultralytics/assets/bus.jpg",
+        #         "person,bus",
+        #         "yoloe-v8l",
+        #         640,
+        #         0.25,
+        #         0.7]], 
+        #     inputs=[raw_image, texts, model_id, image_size, conf_thresh, iou_thresh], 
+        #     visible=True, cache_examples=False, label="Text Prompt Examples")
 
-        box_examples = gr.Examples(
-            examples=[[
-                {"image": "ultralytics/assets/bus_box.jpg", "points": [[235, 408, 2, 342, 863, 3]]},
-                "ultralytics/assets/zidane.jpg",
-                "yoloe-v8l",
-                640,
-                0.2,
-                0.7,
-            ]], 
-            inputs=[box_image, target_image, model_id, image_size, conf_thresh, iou_thresh], 
-            visible=False, cache_examples=False, label="Box Visual Prompt Examples")
+        # box_examples = gr.Examples(
+        #     examples=[[
+        #         {"image": "ultralytics/assets/bus_box.jpg", "points": [[235, 408, 2, 342, 863, 3]]},
+        #         "ultralytics/assets/zidane.jpg",
+        #         "yoloe-v8l",
+        #         640,
+        #         0.2,
+        #         0.7,
+        #     ]], 
+        #     inputs=[box_image, target_image, model_id, image_size, conf_thresh, iou_thresh], 
+        #     visible=False, cache_examples=False, label="Box Visual Prompt Examples")
 
-        mask_examples = gr.Examples(
-            examples=[[
-                {"background": "ultralytics/assets/bus.jpg", "layers": ["ultralytics/assets/bus_mask.png"], "composite": "ultralytics/assets/bus_composite.jpg"},
-                "ultralytics/assets/zidane.jpg",
-                "yoloe-v8l",
-                640,
-                0.15,
-                0.7,
-            ]],
-            inputs=[mask_image, target_image, model_id, image_size, conf_thresh, iou_thresh],
-            visible=False, cache_examples=False, label="Mask Visual Prompt Examples")
+        # mask_examples = gr.Examples(
+        #     examples=[[
+        #         {"background": "ultralytics/assets/bus.jpg", "layers": ["ultralytics/assets/bus_mask.png"], "composite": "ultralytics/assets/bus_composite.jpg"},
+        #         "ultralytics/assets/zidane.jpg",
+        #         "yoloe-v8l",
+        #         640,
+        #         0.15,
+        #         0.7,
+        #     ]],
+        #     inputs=[mask_image, target_image, model_id, image_size, conf_thresh, iou_thresh],
+        #     visible=False, cache_examples=False, label="Mask Visual Prompt Examples")
 
-        pf_examples = gr.Examples(
-            examples=[[
-                "ultralytics/assets/bus.jpg",
-                "yoloe-v8l",
-                640,
-                0.25,
-                0.7,
-            ]], 
-            inputs=[raw_image, model_id, image_size, conf_thresh, iou_thresh], 
-            visible=False, cache_examples=False, label="Prompt-free Examples")
+        # pf_examples = gr.Examples(
+        #     examples=[[
+        #         "ultralytics/assets/bus.jpg",
+        #         "yoloe-v8l",
+        #         640,
+        #         0.25,
+        #         0.7,
+        #     ]], 
+        #     inputs=[raw_image, model_id, image_size, conf_thresh, iou_thresh], 
+        #     visible=False, cache_examples=False, label="Prompt-free Examples")
         
         # Components update
         def load_box_example(visual_usage_type):
@@ -274,17 +275,17 @@ def app():
         def load_mask_example(visual_usage_type):
             return gr.update(visible=True), gr.update(visible=(visual_usage_type=="Cross-Image"))
             
-        box_examples.load_input_event.then(
-            fn=load_box_example,
-            inputs=visual_usage_type,
-            outputs=[box_image, target_image]
-        )
+        # box_examples.load_input_event.then(
+        #     fn=load_box_example,
+        #     inputs=visual_usage_type,
+        #     outputs=[box_image, target_image]
+        # )
         
-        mask_examples.load_input_event.then(
-            fn=load_mask_example,
-            inputs=visual_usage_type,
-            outputs=[mask_image, target_image]
-        )
+        # mask_examples.load_input_event.then(
+        #     fn=load_mask_example,
+        #     inputs=visual_usage_type,
+        #     outputs=[mask_image, target_image]
+        # )
 
         # Examples update
         def update_text_examples():
@@ -299,31 +300,31 @@ def app():
             elif visual_prompt_type == "masks":
                 return gr.Dataset(visible=False), gr.Dataset(visible=False), gr.Dataset(visible=True), gr.Dataset(visible=False),
 
-        text_tab.select(
-            fn=update_text_examples,
-            inputs=None,
-            outputs=[text_examples.dataset, box_examples.dataset, mask_examples.dataset, pf_examples.dataset]
-        )
-        visual_tab.select(
-            fn=update_visual_examples,
-            inputs=[visual_prompt_type],
-            outputs=[text_examples.dataset, box_examples.dataset, mask_examples.dataset, pf_examples.dataset]
-        )
-        prompt_free_tab.select(
-            fn=update_pf_examples,
-            inputs=None,
-            outputs=[text_examples.dataset, box_examples.dataset, mask_examples.dataset, pf_examples.dataset]
-        )
-        visual_prompt_type.change(
-            fn=update_visual_examples,
-            inputs=[visual_prompt_type],
-            outputs=[text_examples.dataset, box_examples.dataset, mask_examples.dataset, pf_examples.dataset]
-        )
-        visual_usage_type.change(
-            fn=update_visual_examples,
-            inputs=[visual_prompt_type],
-            outputs=[text_examples.dataset, box_examples.dataset, mask_examples.dataset, pf_examples.dataset]
-        )
+        # text_tab.select(
+        #     fn=update_text_examples,
+        #     inputs=None,
+        #     outputs=[text_examples.dataset, box_examples.dataset, mask_examples.dataset, pf_examples.dataset]
+        # )
+        # visual_tab.select(
+        #     fn=update_visual_examples,
+        #     inputs=[visual_prompt_type],
+        #     outputs=[text_examples.dataset, box_examples.dataset, mask_examples.dataset, pf_examples.dataset]
+        # )
+        # prompt_free_tab.select(
+        #     fn=update_pf_examples,
+        #     inputs=None,
+        #     outputs=[text_examples.dataset, box_examples.dataset, mask_examples.dataset, pf_examples.dataset]
+        # )
+        # visual_prompt_type.change(
+        #     fn=update_visual_examples,
+        #     inputs=[visual_prompt_type],
+        #     outputs=[text_examples.dataset, box_examples.dataset, mask_examples.dataset, pf_examples.dataset]
+        # )
+        # visual_usage_type.change(
+        #     fn=update_visual_examples,
+        #     inputs=[visual_prompt_type],
+        #     outputs=[text_examples.dataset, box_examples.dataset, mask_examples.dataset, pf_examples.dataset]
+        # )
 
 
 gradio_app = gr.Blocks()
@@ -331,34 +332,13 @@ with gradio_app:
     gr.HTML(
         """
     <h1 style='text-align: center'>
-    <img src="/file=figures/logo.png" width="2.5%" style="display:inline;padding-bottom:4px">
     YOLOE: Real-Time Seeing Anything
     </h1>
     """)
-    gr.HTML(
-        """
-        <h3 style='text-align: center'>
-        <a href='https://arxiv.org/abs/2503.07465' target='_blank'>arXiv</a> | <a href='https://github.com/THU-MIG/yoloe' target='_blank'>github</a>
-        </h3>
-        """)
-    gr.Markdown(
-        """
-        We introduce **YOLOE(ye)**, a highly **efficient**, **unified**, and **open** object detection and segmentation model, like human eye, under different prompt mechanisms, like *texts*, *visual inputs*, and *prompt-free paradigm*.
-        """
-    )
-    gr.Markdown(
-        """
-        If desired objects are not identified, pleaset set a **smaller** confidence threshold, e.g., for visual prompts with handcrafted shape or cross-image prompts.
-        """
-    )
-    gr.Markdown(
-        """
-        Drawing **multiple** boxes or handcrafted shapes as visual prompt in an image is also supported, which leads to more accurate prompt.
-        """
-    )
+
     with gr.Row():
         with gr.Column():
             app()
 
 if __name__ == '__main__':
-    gradio_app.launch(allowed_paths=["figures"])
+    gradio_app.launch(allowed_paths=["figures"],share=True)
